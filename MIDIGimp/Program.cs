@@ -28,20 +28,12 @@ namespace MIDIGimp
                             float brushSize = (float)((cc.ControllerValue + 1) * 2);
                             gimpClient.SendCommand($"(gimp-context-set-brush-size {brushSize})\n");
                         }
-
+                        if (cnum == 26 && cc.ControllerValue == 127)
+                        {
+                            sim.Keyboard.ModifiedKeyStroke(VirtualKeyCode.SHIFT, VirtualKeyCode.VK_R);
+                        }
                         if (cnum == 7)
                         {
-                            int size = cc.ControllerValue * 4 + 1;
-                            string script = $@"
-                (let* (
-                      (img (car (gimp-image-list)))
-                      (layer (car (gimp-image-get-active-layer img)))
-                    )
-                    (gimp-layer-scale layer {size} {size} INTERPOLATION-CUBIC)
-                )
-                ";
-
-                            gimpClient.SendCommand(script.Replace("\r\n", "\n") + "\n");
                         }
 
                         messageWait = false;
