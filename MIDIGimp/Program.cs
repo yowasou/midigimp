@@ -34,12 +34,13 @@ namespace MIDIGimp
                       (layer (car (gimp-image-get-active-layer img)))
                       (width (car (gimp-drawable-width layer)))
                       (height (car (gimp-drawable-height layer)))
+                      (new-width(inexact->exact (floor (* {bairitsu} width))))
+                      (new-height(inexact->exact (floor (* {bairitsu} height))))
                     )
-                    gimp-message (number->string (* height 2))
+                    gimp-message number->string new-height
                 )
                 ";
-                            //(new-width(*1 width))
-                            //(new-height(*1 height))
+
                             //(gimp-message number->string new-width)
                             //(gimp-layer-scale layer new-width new-height INTERPOLATION-CUBIC)
                             gimpClient.SendCommand(script.Replace("\r\n", "\n") + "\n");
