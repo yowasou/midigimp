@@ -1,4 +1,6 @@
 ﻿using NAudio.Midi;
+using WindowsInput;
+using WindowsInput.Native;
 
 namespace MIDIGimp
 {
@@ -9,6 +11,7 @@ namespace MIDIGimp
         {
             using var gimpClient = new GimpClient();
             var inDevice = new MidiIn(0);
+            var sim = new InputSimulator();
             inDevice.MessageReceived += (s, e) =>
             {
                 lock (gimpClient)
@@ -21,28 +24,23 @@ namespace MIDIGimp
 
                         if (cnum == 6)
                         {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_P);
                             float brushSize = (float)((cc.ControllerValue + 1) * 2);
                             gimpClient.SendCommand($"(gimp-context-set-brush-size {brushSize})\n");
                         }
 
                         if (cnum == 7)
                         {
-                            float bairitsu = MIDIFunc.MapValue(cc.ControllerValue);
+                            int size = cc.ControllerValue * 4 + 1;
                             string script = $@"
                 (let* (
                       (img (car (gimp-image-list)))
                       (layer (car (gimp-image-get-active-layer img)))
-                      (width (car (gimp-drawable-width layer)))
-                      (height (car (gimp-drawable-height layer)))
-                      (new-width(inexact->exact (floor (* {bairitsu} width))))
-                      (new-height(inexact->exact (floor (* {bairitsu} height))))
                     )
-                    gimp-message number->string new-height
+                    (gimp-layer-scale layer {size} {size} INTERPOLATION-CUBIC)
                 )
                 ";
 
-                            //(gimp-message number->string new-width)
-                            //(gimp-layer-scale layer new-width new-height INTERPOLATION-CUBIC)
                             gimpClient.SendCommand(script.Replace("\r\n", "\n") + "\n");
                         }
 
