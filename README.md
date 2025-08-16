@@ -1,0 +1,2 @@
+# midigimp
+MIDIコントローラーでGIMPを操作するためのサーバー
