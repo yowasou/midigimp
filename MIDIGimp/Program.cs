@@ -54,38 +54,4 @@ class Program
             Console.WriteLine("エラー: " + ex.Message);
         }
     }
-    static void sendtest()
-    {
-        string gimpHost = "127.0.0.1"; // GIMPが動作しているホスト
-        int gimpPort = 10008;           // Script-Fuサーバーのポート
-
-        try
-        {
-            using (TcpClient client = new TcpClient(gimpHost, gimpPort))
-            using (NetworkStream stream = client.GetStream())
-            {
-                // Script-Fuで実行するSchemeコードを作成
-                string script = @"
-                    ; 新しい画像を作成 (幅: 400, 高さ: 300, RGB)
-                    (define img (car (gimp-image-new 400 300 RGB)))
-                    (define layer (car (gimp-layer-new img 400 300 RGB-IMAGE 'Layer 100 NORMAL-MODE)))
-                    (gimp-image-insert-layer img layer 0 0)
-                    (gimp-context-set-brush-size 50)
-                    (gimp-context-set-foreground '(255 0 0)) ; 赤色
-                    (gimp-paintbrush layer 0 4  '(50 50 350 250))
-                    (gimp-display-new img)
-                ";
-
-                // 改行で区切って送信
-                byte[] data = Encoding.ASCII.GetBytes(script + "\n");
-                stream.Write(data, 0, data.Length);
-
-                Console.WriteLine("Command sent to GIMP Script-Fu server.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error: " + ex.Message);
-        }
-    }
 }
